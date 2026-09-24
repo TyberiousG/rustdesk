@@ -89,13 +89,27 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
+#ifdef TYBERIAN_QUICK_SUPPORT
+            VALUE "CompanyName", "Tyberian" "\0"
+            VALUE "FileDescription", "Tyberian Remote Support" "\0"
+#else
             VALUE "CompanyName", "Purslane Tech Pte. Ltd." "\0"
             VALUE "FileDescription", "RustDesk Remote Desktop" "\0"
+#endif
             VALUE "FileVersion", VERSION_AS_STRING "\0"
+#ifdef TYBERIAN_QUICK_SUPPORT
+            VALUE "InternalName", "TyberianRemoteSupport" "\0"
+#else
             VALUE "InternalName", "rustdesk" "\0"
+#endif
             VALUE "LegalCopyright", "Copyright © 2026 Purslane Tech Pte. Ltd. All rights reserved." "\0"
+#ifdef TYBERIAN_QUICK_SUPPORT
+            VALUE "OriginalFilename", "TyberianRemoteSupport.exe" "\0"
+            VALUE "ProductName", "Tyberian Remote Support" "\0"
+#else
             VALUE "OriginalFilename", "rustdesk.exe" "\0"
             VALUE "ProductName", "RustDesk" "\0"
+#endif
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

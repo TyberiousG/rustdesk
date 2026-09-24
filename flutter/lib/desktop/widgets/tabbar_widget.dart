@@ -13,6 +13,7 @@ import 'package:flutter_hbb/desktop/pages/view_camera_page.dart';
 import 'package:flutter_hbb/main.dart';
 import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:flutter_hbb/models/state_model.dart';
+import 'package:flutter_hbb/tyberian/distribution_config.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:scroll_pos/scroll_pos.dart';
@@ -466,6 +467,12 @@ class _DesktopTabState extends State<DesktopTab>
     }
 
     await _saveFrame(flush: true);
+
+    if (isMainWindow && TyberianDistribution.quickSupportMode) {
+      await windowManager.setPreventClose(false);
+      await windowManager.close();
+      return;
+    }
 
     // hide window on close
     if (isMainWindow) {

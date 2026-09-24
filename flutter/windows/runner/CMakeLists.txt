@@ -30,6 +30,9 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_BUILD=${FLUTT
 
 # Disable Windows macros that collide with C++ standard library functions.
 target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
+if(DEFINED ENV{TYBERIAN_QUICK_SUPPORT} AND "$ENV{TYBERIAN_QUICK_SUPPORT}" STREQUAL "1")
+  target_compile_definitions(${BINARY_NAME} PRIVATE "TYBERIAN_QUICK_SUPPORT=1")
+endif()
 
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.

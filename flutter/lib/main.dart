@@ -17,6 +17,7 @@ import 'package:flutter_hbb/desktop/screen/desktop_remote_screen.dart';
 import 'package:flutter_hbb/desktop/screen/desktop_terminal_screen.dart';
 import 'package:flutter_hbb/desktop/widgets/refresh_wrapper.dart';
 import 'package:flutter_hbb/models/state_model.dart';
+import 'package:flutter_hbb/tyberian/distribution_config.dart';
 import 'package:flutter_hbb/utils/multi_window_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -36,6 +37,12 @@ WindowType? kWindowType;
 late List<String> kBootArgs;
 
 Future<void> main(List<String> args) async {
+  TyberianDistribution.validate();
+  if (TyberianDistribution.quickSupportMode &&
+      args.isNotEmpty &&
+      args.first == 'multi_window') {
+    exit(2);
+  }
   earlyAssert();
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -133,6 +140,17 @@ Future<void> initEnv(String appType) async {
 void runMainApp(bool startService) async {
   // register uni links
   await initEnv(kAppTypeMain);
+  if (TyberianDistribution.quickSupportMode) {
+    await bind.mainSetOption(
+        key: 'custom-rendezvous-server',
+        value: TyberianDistribution.idServer);
+    await bind.mainSetOption(
+        key: 'relay-server', value: TyberianDistribution.relayServer);
+    await bind.mainSetOption(
+        key: 'key', value: TyberianDistribution.serverPublicKey);
+    await bind.mainSetOption(
+        key: kOptionVerificationMethod, value: 'use-temporary-password');
+  }
   checkUpdate();
   // trigger connection status updater
   await bind.mainCheckConnectStatus();
@@ -167,7 +185,9 @@ void runMainApp(bool startService) async {
       rustDeskWinManager.registerActiveWindow(kWindowMainId);
     }
     windowManager.setOpacity(1);
-    windowManager.setTitle(getWindowName());
+    windowManager.setTitle(TyberianDistribution.quickSupportMode
+        ? TyberianDistribution.productName
+        : getWindowName());
     // Do not use `windowManager.setResizable()` here.
     setResizable(!bind.isIncomingOnly());
   });
@@ -495,9 +515,11 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         child: GetMaterialApp(
           navigatorKey: globalKey,
           debugShowCheckedModeBanner: false,
-          title: isWeb
-              ? '${bind.mainGetAppNameSync()} Web Client V2 (Preview)'
-              : bind.mainGetAppNameSync(),
+          title: TyberianDistribution.quickSupportMode
+              ? TyberianDistribution.productName
+              : isWeb
+                  ? '${bind.mainGetAppNameSync()} Web Client V2 (Preview)'
+                  : bind.mainGetAppNameSync(),
           theme: MyTheme.lightTheme,
           darkTheme: MyTheme.darkTheme,
           themeMode: MyTheme.currentThemeMode(),

@@ -6,7 +6,10 @@ import 'package:flutter_hbb/desktop/pages/desktop_setting_page.dart';
 import 'package:flutter_hbb/desktop/widgets/tabbar_widget.dart';
 import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:flutter_hbb/models/state_model.dart';
+import 'package:flutter_hbb/tyberian/distribution_config.dart';
+import 'package:flutter_hbb/tyberian/quick_support_page.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 // import 'package:flutter/services.dart';
 
@@ -49,9 +52,15 @@ class _DesktopTabPageState extends State<DesktopTabPage> {
         selectedIcon: Icons.home_sharp,
         unselectedIcon: Icons.home_outlined,
         closable: false,
-        page: DesktopHomePage(
-          key: const ValueKey(kTabLabelHomePage),
-        )));
+        page: TyberianDistribution.quickSupportMode
+            ? ChangeNotifierProvider.value(
+                value: gFFI.serverModel,
+                child: const TyberianQuickSupportPage(
+                    key: ValueKey(kTabLabelHomePage)),
+              )
+            : const DesktopHomePage(
+                key: ValueKey(kTabLabelHomePage),
+              )));
     if (bind.isIncomingOnly()) {
       tabController.onSelected = (key) {
         if (key == kTabLabelHomePage) {
@@ -97,7 +106,9 @@ class _DesktopTabPageState extends State<DesktopTabPage> {
             body: DesktopTab(
               controller: tabController,
               tail: Offstage(
-                offstage: bind.isIncomingOnly() || bind.isDisableSettings(),
+                offstage: TyberianDistribution.quickSupportMode ||
+                    bind.isIncomingOnly() ||
+                    bind.isDisableSettings(),
                 child: ActionIcon(
                   message: 'Settings',
                   icon: IconFont.menu,
